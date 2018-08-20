@@ -20,7 +20,7 @@ platforms, as well as bubbles which will bounce around.
 
 The app will include a dropdown menu allowing the user to choose the number of bubbles generated as well as the size and color of bubbles.
 
-![wireframe](/Users/whitman/Desktop/BubbleBros/lib/images/wireframe.png)
+![wireframe](/lib/images/wireframe.png)
 
 ## Architecture and Technologies
 This project will be implemented with the following technologies:
