@@ -41,28 +41,31 @@ In addition to the entry file, there will be 7 scripts included in this project:
 ## Implementation Timeline
 
 Over the weekend:
-[] Set up logic for movement and collision of objects
-[] Render canvas with background image and player
-[] Set up all necessary node modules and configure webpack
+
+- [ ] Set up logic for movement and collision of objects
+- [ ] Render canvas with background image and player
+- [ ] Set up all necessary node modules and configure webpack
 
 Day 1: Get player to move around, change animation while running or jumping, and render bubbles
-[] Set up player movement
-[] Change animation while moving
-[] render bubbles
-[] begin setting up movement of bubbles
+
+- [ ] Set up player movement
+- [ ] Change animation while moving
+- [ ] render bubbles
+- [ ] begin setting up movement of bubbles
 
 Day 2: Finish setting up movement of bubbles, set up shooting, and handle collision of bubbles with grappling hooks
-[] Get bubbles to bounce smoothly and correct speed
-[] Set up shooting of grappling hooks
-[] Get hooks to move smoothly and stay for correct amount of time
-[] Handle collision of bubbles with hooks
+
+- [ ] Get bubbles to bounce smoothly and correct speed
+- [ ] Set up shooting of grappling hooks 
+- [ ] Get hooks to move smoothly and stay for correct amount of time
+- [ ] Handle collision of bubbles with hooks
 
 Day 3: Build platforms and set up ladders (or portals depending on whether I can find a sprite with climbing animations)
-[] Render platforms
-[] Handle player movement on platforms
-[] Render ladders or portals
-[] Get player to climb or teleport to platforms
+- [ ] Render platforms
+- [ ] Handle player movement on platforms
+- [ ] Render ladders or portals
+- [ ] Get player to climb or teleport to platforms
 
 Day 4: Set up preset levels and options for setting bubble size, number and speed
-[] Set up some preset levels with different backgrounds and differing numbers of bubbles and platforms
-[] Create controls for the user to set number, size, and speed of bubbles themselves
+- [ ] Set up some preset levels with different backgrounds and differing numbers of bubbles and platforms
+- [ ] Create controls for the user to set number, size, and speed of bubbles themselves
