@@ -57,7 +57,6 @@
   function dispatch(event, scope){
     var key, handler, k, i, modifiersMatch;
     key = event.keyCode;
-
     if (index(_downKeys, key) == -1) {
         _downKeys.push(key);
     }
@@ -105,6 +104,7 @@
 
   // unset modifier keys on keyup
   function clearModifier(event){
+    debugger;
     var key = event.keyCode, k,
         i = index(_downKeys, key);
 
