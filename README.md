@@ -35,7 +35,7 @@ In addition to the entry file, there will be 7 scripts included in this project:
 ``` game_view.js ``` renders the game to the screen and binds keys to actions
 ``` player.js ``` renders the player and handles player movement
 ``` bubble.js ``` sets options for how to render bubbles
-``` bullet.js ``` sets options for how to render bullets
+``` grapple.js ``` sets options for how to render grapples
 ``` moving_object.js ``` renders various objects to the screen and handles movement
 
 ## Implementation Timeline
