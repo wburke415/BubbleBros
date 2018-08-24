@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
     "lodash": "^4.17.10",
     "source-map": "^0.7.3",
     "webpack": "^4.16.5",
