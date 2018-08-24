@@ -343,6 +343,7 @@ var Game = function () {
       if (object instanceof _bubble2.default) {
         this.bubbles.push(object);
       } else if (object instanceof _grapple2.default) {
+        this.grapples = [];
         this.grapples.push(object);
       } else if (object instanceof _player2.default) {
         this.players.push(object);
@@ -464,13 +465,15 @@ var Game = function () {
         ctxBG.drawImage(backgroundImage, levelCoordinates[0], levelCoordinates[1], 384, 208, 0, 0, Game.DIM_X, Game.DIM_Y);
       };
 
+      this.nonPlayerObjects().forEach(function (object) {
+        return object.draw(ctxBG);
+      });
+
       if (this.stageClear && this.stageClearTimer > 0) {
         var stageClear = new Image();
         stageClear.src = Game.STAGE_CLEAR_IMAGE;
 
-        stageClear.onload = function () {
-          ctxBG.drawImage(stageClear, Game.STAGE_CLEAR[0], Game.STAGE_CLEAR[1], Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
-        };
+        ctxBG.drawImage(stageClear, Game.STAGE_CLEAR[0], Game.STAGE_CLEAR[1], Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
 
         this.stageClearTimer -= 1;
 
@@ -482,14 +485,8 @@ var Game = function () {
         var gameOver = new Image();
         gameOver.src = Game.GAME_OVER_IMAGE;
 
-        gameOver.onload = function () {
-          ctxBG.drawImage(gameOver, Game.GAME_OVER[0], Game.GAME_OVER[1], Game.GAME_OVER[2], Game.GAME_OVER[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.GAME_OVER[2], Game.GAME_OVER[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
-        };
+        ctxBG.drawImage(gameOver, Game.GAME_OVER[0], Game.GAME_OVER[1], Game.GAME_OVER[2], Game.GAME_OVER[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.GAME_OVER[2], Game.GAME_OVER[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
       }
-
-      this.nonPlayerObjects().forEach(function (object) {
-        return object.draw(ctxBG);
-      });
     }
   }, {
     key: 'drawBorder',
@@ -507,7 +504,7 @@ var Game = function () {
 
       ctxHUD.drawImage(livesImage, Game.HUD_LIVES[0], Game.HUD_LIVES[1], Game.HUD_LIVES[2], Game.HUD_LIVES[3], 20, Game.DIM_Y + 25, Game.HUD_LIVES[2] * 2, Game.HUD_LIVES[3] * 2);
 
-      ctxHUD.font = "34px Comic Sans MS";
+      ctxHUD.font = "34px Sans Serif";
       ctxHUD.fillStyle = "yellow";
       ctxHUD.fillText('x ' + (this.players[0] ? this.players[0].livesLeft : 0), 62, Game.DIM_Y + 53);
       ctxHUD.fillText('' + this.points, Game.DIM_X / 2 - 30, Game.DIM_Y + 53);

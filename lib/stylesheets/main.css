@@ -1,11 +1,6 @@
-main {
-  width: 80%;
-  margin: 0 auto;
-}
-
 #canvas-container {
-  position: relative;
-  display: flex;
+  display: block;
+  margin: 0 auto;
 }
 
 #border {
@@ -22,12 +17,15 @@ main {
   position: absolute;
   z-index: 2;
   top: 20px;
-  /* left: 20px; */
 }
 
 #player {
   position: absolute;
   z-index: 3;
   top: 20px;
-  /* left: 20px; */
+}
+
+div {
+  position: absolute;
+  top: 600px;
 }
