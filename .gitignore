@@ -1,6 +1,4 @@
 node_modules/
 .vscode/
 tmp/
-bundle.js
-bundle.map.js
 .DS_store
