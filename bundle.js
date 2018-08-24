@@ -330,7 +330,7 @@ var Game = function () {
     this.addPlatforms();
 
     this.stageClear = false;
-    this.stageClearTimer = 300;
+    this.stageClearTimer = 299;
 
     this.gameOver = false;
 
