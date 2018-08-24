@@ -330,7 +330,7 @@ var Game = function () {
     this.addPlatforms();
 
     this.stageClear = false;
-    this.stageClearTimer = 299;
+    this.stageClearTimer = 300;
 
     this.gameOver = false;
 
@@ -378,7 +378,8 @@ var Game = function () {
           game: this,
           pos: level.PLATFORM_POS[i].slice(0),
           height: level.PLATFORM_HEIGHT[i],
-          width: level.PLATFORM_WIDTH[i]
+          width: level.PLATFORM_WIDTH[i],
+          hasLadder: level.PLATFORM_HAS_LADDER
         }));
       }
     }
@@ -927,7 +928,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 0,
     PLATFORM_POS: [],
     PLATFORM_HEIGHT: [],
-    PLATFORM_WIDTH: []
+    PLATFORM_WIDTH: [],
+    PLATFORM_HAS_LADDER: false
   },
   2: {
     NUM_BUBBLES: 2,
@@ -938,7 +940,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[150, 300]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200]
+    PLATFORM_WIDTH: [200],
+    PLATFORM_HAS_LADDER: true
   },
   3: {
     NUM_BUBBLES: 2,
@@ -949,7 +952,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[650, 300]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200]
+    PLATFORM_WIDTH: [200],
+    PLATFORM_HAS_LADDER: true
   },
   4: {
     NUM_BUBBLES: 2,
@@ -960,7 +964,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[270, 200]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [400]
+    PLATFORM_WIDTH: [400],
+    PLATFORM_HAS_LADDER: true
   },
   5: {
     NUM_BUBBLES: 3,
@@ -971,7 +976,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 0,
     PLATFORM_POS: [],
     PLATFORM_HEIGHT: [],
-    PLATFORM_WIDTH: []
+    PLATFORM_WIDTH: [],
+    PLATFORM_HAS_LADDER: true
   },
   6: {
     NUM_BUBBLES: 2,
@@ -982,7 +988,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 2,
     PLATFORM_POS: [[150, 300], [600, 300]],
     PLATFORM_HEIGHT: [10, 10],
-    PLATFORM_WIDTH: [250, 250]
+    PLATFORM_WIDTH: [250, 250],
+    PLATFORM_HAS_LADDER: true
   },
   7: {
     NUM_BUBBLES: 3,
@@ -993,7 +1000,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[40, 300]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200]
+    PLATFORM_WIDTH: [200],
+    PLATFORM_HAS_LADDER: true
   },
   8: {
     NUM_BUBBLES: 2,
@@ -1004,7 +1012,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[300, 300]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [300]
+    PLATFORM_WIDTH: [300],
+    PLATFORM_HAS_LADDER: true
   },
   9: {
     NUM_BUBBLES: 3,
@@ -1015,7 +1024,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 0,
     PLATFORM_POS: [],
     PLATFORM_HEIGHT: [],
-    PLATFORM_WIDTH: []
+    PLATFORM_WIDTH: [],
+    PLATFORM_HAS_LADDER: true
   },
   10: {
     NUM_BUBBLES: 3,
@@ -1026,7 +1036,8 @@ var LEVELS = exports.LEVELS = {
     NUM_PLATFORMS: 1,
     PLATFORM_POS: [[300, 300]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [300]
+    PLATFORM_WIDTH: [300],
+    PLATFORM_HAS_LADDER: true
   },
   11: {},
   12: {},
