@@ -106,10 +106,6 @@ var _moving_object = __webpack_require__(/*! ./moving_object */ "./lib/javascrip
 
 var _moving_object2 = _interopRequireDefault(_moving_object);
 
-var _player = __webpack_require__(/*! ./player */ "./lib/javascript/player.js");
-
-var _player2 = _interopRequireDefault(_player);
-
 var _grapple = __webpack_require__(/*! ./grapple */ "./lib/javascript/grapple.js");
 
 var _grapple2 = _interopRequireDefault(_grapple);
@@ -125,9 +121,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Util = __webpack_require__(/*! ./util */ "./lib/javascript/util.js");
-
 
 var DEFAULTS = {
   VELOCITY: [2, 4],
@@ -1473,40 +1466,6 @@ var Player = function (_MovingObject) {
 }(_moving_object2.default);
 
 exports.default = Player;
-
-/***/ }),
-
-/***/ "./lib/javascript/util.js":
-/*!********************************!*\
-  !*** ./lib/javascript/util.js ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Util = {
-  dir: function dir(vec) {
-    var norm = Util.norm(vec);
-    return Util.scale(vec, 1 / norm);
-  },
-  dist: function dist(pos1, pos2) {
-    return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
-  },
-  norm: function norm(vec) {
-    return Util.dist([0, 0], vec);
-  },
-  randomVec: function randomVec(length) {
-    var deg = 2 * Math.PI * Math.random();
-    return Util.scale([Math.sin(deg), Math.cos(deg)], length);
-  },
-  scale: function scale(vec, m) {
-    return [vec[0] * m, vec[1] * m];
-  }
-};
-
-module.exports = Util;
 
 /***/ })
 
