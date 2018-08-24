@@ -330,7 +330,7 @@ var Game = function () {
     this.addPlatforms();
 
     this.stageClear = false;
-    this.stageClearTimer = 299;
+    this.stageClearTimer = 300;
 
     this.gameOver = false;
 
@@ -1180,7 +1180,7 @@ var Platform = function (_MovingObject) {
 
     var _this = _possibleConstructorReturn(this, (Platform.__proto__ || Object.getPrototypeOf(Platform)).call(this, options));
 
-    _this.hasLadder = options.hasLadder || false;
+    _this.hasLadder = options.hasLadder || true;
     if (_this.hasLadder) _this.ladder = _this.generateLadder();
     return _this;
   }
