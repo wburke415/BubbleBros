@@ -1,6 +1,33 @@
-/* .canvas-container {
-    max-height: 720px;
-    max-width: 1275px;
-    margin: 0 auto;
-    background-image: url("../images/mountain_full_background1.png");
-} */
+main {
+  width: 80%;
+  margin: 0 auto;
+}
+
+#canvas-container {
+  position: relative;
+  display: flex;
+}
+
+#border {
+  position: absolute;
+  z-index: 0;
+}
+
+#hud {
+  position: absolute;
+  z-index: 1;
+}
+
+#background {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  /* left: 20px; */
+}
+
+#player {
+  position: absolute;
+  z-index: 3;
+  top: 20px;
+  /* left: 20px; */
+}
