@@ -317,7 +317,7 @@ var Game = function () {
     this.platforms = [];
     this.ladders = [];
 
-    this.level = 1;
+    this.level = 2;
 
     this.addBubbles();
     this.addPlatforms();
@@ -589,6 +589,11 @@ var Game = function () {
       player.platform = null;
       player.climbing = false;
       player.pos = this.playerStartPos(player.playerNumber);
+    }
+  }, {
+    key: 'resetPlayerY',
+    value: function resetPlayerY(player) {
+      player.pos[1] = this.playerStartPos(player.playerNumber)[1];
     }
   }, {
     key: 'playerStartPos',
@@ -912,8 +917,8 @@ var LEVELS = exports.LEVELS = {
   1: {
     NUM_BUBBLES: 1,
     BUBBLE_SIZE: [1],
-    BUBBLE_START_POS: [[100, 200]],
-    BUBBLE_VELOCITY: [[2, 4]],
+    BUBBLE_START_POS: [[800, 200]],
+    BUBBLE_VELOCITY: [[-2, 4]],
 
     NUM_PLATFORMS: 0,
     PLATFORM_POS: [],
@@ -1418,16 +1423,15 @@ var Player = function (_MovingObject) {
   }, {
     key: 'climb',
     value: function climb(changeInPos) {
-      // add additional logic for climbing up or down
       if (!this.dying && !this.game.stageClear) {
         if (changeInPos[1] === -1 && this.ladder && this.isCollidedWith(this.ladder)) {
           this.climbing = true;
-          this.vel[1] = changeInPos[1];
+          this.vel[1] = changeInPos[1] * 2;
           this.sprite = CLIMBING_ANIMATION[Math.floor(this.spriteIndex)];
           this.spriteIndex = (this.spriteIndex + 0.5) % 4;
         } else if (changeInPos[1] === 1 && this.isCollidedWith(this.ladder, 10) && !this.game.isOutOfBounds(this)) {
           this.climbing = true;
-          this.vel[1] = changeInPos[1];
+          this.vel[1] = changeInPos[1] * 2;
           this.sprite = CLIMBING_ANIMATION[Math.floor(this.spriteIndex)];
           this.spriteIndex = (this.spriteIndex + 0.5) % 4;
         } else {
@@ -1441,13 +1445,13 @@ var Player = function (_MovingObject) {
     value: function stopClimbing() {
       if (!this.dying) {
         if (this.platform && !this.isCollidedWith(this.platform)) this.platform = null;
-        // if (this.pos[1] > this.game.playerStartPos(this.playerNumber)[1]) this.pos[1] = this.playerStartPos(this.playerNumber)[1];
 
         this.vel = [0, 0];
 
         if (!this.climbing) {
           this.spriteIndex = 0;
           this.sprite = STANDING_ANIMATION;
+          if (this.game.isOutOfBounds(this)) this.game.resetPlayerY(this);
         }
       }
     }
