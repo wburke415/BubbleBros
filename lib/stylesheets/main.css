@@ -2,11 +2,16 @@ body {
   background-color: black;
 }
 
+#image-container {
+  display: flex;
+  justify-content: center;
+}
+
 #canvas-container {
   display: flex;
   justify-content: center;
   position: relative;
-  margin-top: 100px;
+  /* margin-top: 20px; */
 }
 
 #border {
