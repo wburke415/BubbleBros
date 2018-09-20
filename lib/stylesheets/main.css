@@ -1,6 +1,12 @@
+body {
+  background-color: black;
+}
+
 #canvas-container {
   display: flex;
   justify-content: center;
+  position: relative;
+  margin-top: 100px;
 }
 
 #border {
