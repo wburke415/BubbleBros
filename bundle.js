@@ -317,7 +317,7 @@ var Game = function () {
     this.platforms = [];
     this.ladders = [];
 
-    this.level = 2;
+    this.level = 1;
 
     this.addBubbles();
     this.addPlatforms();
