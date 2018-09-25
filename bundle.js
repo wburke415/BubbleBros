@@ -238,11 +238,6 @@ var _game_view2 = _interopRequireDefault(_game_view);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener('DOMContentLoaded', function () {
-  var border = document.getElementById('border');
-  border.width = _game2.default.DIM_X_HUD;
-  border.height = _game2.default.DIM_Y_HUD;
-  var ctxBORDER = border.getContext('2d');
-
   var hud = document.getElementById('hud');
   hud.width = _game2.default.DIM_X_HUD;
   hud.height = _game2.default.DIM_Y_HUD;
@@ -260,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var game = new _game2.default();
   window.game = game;
-  new _game_view2.default(game, ctxBORDER, ctxHUD, ctxBG, ctxPLAYER).start();
+  new _game_view2.default(game, ctxHUD, ctxBG, ctxPLAYER).start();
 });
 
 /***/ }),
@@ -323,14 +318,26 @@ var Game = function () {
     this.addPlatforms();
 
     this.stageClear = false;
-    this.stageClearTimer = 300;
+    this.countdown = true;
+    this.timer = 300;
 
     this.gameOver = false;
+    this.paused = false;
 
     this.points = 0;
   }
 
   _createClass(Game, [{
+    key: 'pause',
+    value: function pause() {
+      this.paused = true;
+    }
+  }, {
+    key: 'unpause',
+    value: function unpause() {
+      this.paused = false;
+    }
+  }, {
     key: 'add',
     value: function add(object) {
       if (object instanceof _bubble2.default) {
@@ -440,8 +447,7 @@ var Game = function () {
     }
   }, {
     key: 'draw',
-    value: function draw(ctxBORDER, ctxHUD, ctxBG, ctxPLAYER) {
-      this.drawBorder(ctxBORDER);
+    value: function draw(ctxHUD, ctxBG, ctxPLAYER) {
       this.drawHUD(ctxHUD);
       this.drawBackground(ctxBG);
       this.drawPlayer(ctxPLAYER);
@@ -462,15 +468,14 @@ var Game = function () {
         return object.draw(ctxBG);
       });
 
-      if (this.stageClear && this.stageClearTimer > 0) {
+      if (this.stageClear && this.timer > 0) {
         var stageClear = new Image();
         stageClear.src = Game.STAGE_CLEAR_IMAGE;
 
         ctxBG.drawImage(stageClear, Game.STAGE_CLEAR[0], Game.STAGE_CLEAR[1], Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.STAGE_CLEAR[2], Game.STAGE_CLEAR[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
+        this.timer -= 2;
 
-        this.stageClearTimer -= 1;
-
-        if (this.stageClearTimer === 0) {
+        if (this.timer <= 0) {
           this.stageClear = false;
           this.nextLevel();
         }
@@ -479,13 +484,27 @@ var Game = function () {
         gameOver.src = Game.GAME_OVER_IMAGE;
 
         ctxBG.drawImage(gameOver, Game.GAME_OVER[0], Game.GAME_OVER[1], Game.GAME_OVER[2], Game.GAME_OVER[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.GAME_OVER[2], Game.GAME_OVER[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
+      } else if (this.countdown && this.timer > 0) {
+        if (this.timer > 200) {
+          ctxBG.font = "120px Sans Serif";
+          ctxBG.fillStyle = 'black';
+          ctxBG.fillText('3', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
+        } else if (this.timer > 100) {
+          ctxBG.font = "120px Sans Serif";
+          ctxBG.fillStyle = "black";
+          ctxBG.fillText('2', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
+        } else if (this.timer > 0) {
+          ctxBG.font = "120px Sans Serif";
+          ctxBG.fillStyle = "black";
+          ctxBG.fillText('1', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
+        }
+        this.timer -= 2;
+
+        if (this.timer <= 0) {
+          this.countdown = false;
+          this.timer = 300;
+        }
       }
-    }
-  }, {
-    key: 'drawBorder',
-    value: function drawBorder(ctxBORDER) {
-      ctxBORDER.fillStyle = "#000000";
-      ctxBORDER.fillRect(0, 0, Game.DIM_X_HUD, Game.DIM_Y_HUD);
     }
   }, {
     key: 'drawHUD',
@@ -495,13 +514,13 @@ var Game = function () {
       var livesImage = new Image();
       livesImage.src = Game.HUD_LIVES_IMAGE;
 
-      ctxHUD.drawImage(livesImage, Game.HUD_LIVES[0], Game.HUD_LIVES[1], Game.HUD_LIVES[2], Game.HUD_LIVES[3], 20, Game.DIM_Y + 25, Game.HUD_LIVES[2] * 2, Game.HUD_LIVES[3] * 2);
+      ctxHUD.drawImage(livesImage, Game.HUD_LIVES[0], Game.HUD_LIVES[1], Game.HUD_LIVES[2], Game.HUD_LIVES[3], 20, Game.DIM_Y + 5, Game.HUD_LIVES[2] * 2, Game.HUD_LIVES[3] * 2);
 
       ctxHUD.font = "34px Sans Serif";
       ctxHUD.fillStyle = "yellow";
-      ctxHUD.fillText('x ' + (this.players[0] ? this.players[0].livesLeft : 0), 62, Game.DIM_Y + 53);
-      ctxHUD.fillText('' + this.points, Game.DIM_X / 2 - 30, Game.DIM_Y + 53);
-      ctxHUD.fillText('WORLD ' + this.level, Game.DIM_X - 180, Game.DIM_Y + 53);
+      ctxHUD.fillText('x ' + (this.players[0] ? this.players[0].livesLeft : 0), 62, Game.DIM_Y + 35);
+      ctxHUD.fillText('' + this.points, Game.DIM_X / 2 - 30, Game.DIM_Y + 35);
+      ctxHUD.fillText('WORLD ' + this.level, Game.DIM_X - 180, Game.DIM_Y + 35);
     }
   }, {
     key: 'drawPlayer',
@@ -523,7 +542,7 @@ var Game = function () {
   }, {
     key: 'moveObjects',
     value: function moveObjects(delta) {
-      if (!this.stageClear && !this.gameOver) {
+      if (!this.stageClear && !this.gameOver && !this.countdown) {
         this.allObjects().forEach(function (object) {
           if (object instanceof _grapple2.default) {
             object.height += Math.abs(object.vel[1]);
@@ -574,7 +593,8 @@ var Game = function () {
       this.platforms = [];
       this.ladders = [];
       this.grapples = [];
-      this.stageClearTimer = 300;
+      this.timer = 300;
+      this.countdown = true;
 
       this.players.forEach(function (player) {
         return _this.resetPlayerPos(player);
@@ -603,8 +623,10 @@ var Game = function () {
   }, {
     key: 'step',
     value: function step(delta) {
-      this.moveObjects(delta);
-      this.checkCollisions();
+      if (!this.paused) {
+        this.moveObjects(delta);
+        this.checkCollisions();
+      }
     }
   }]);
 
@@ -651,13 +673,18 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _game = __webpack_require__(/*! ./game */ "./lib/javascript/game.js");
+
+var _game2 = _interopRequireDefault(_game);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var GameView = function () {
-  function GameView(game, ctxBORDER, ctxHUD, ctxBG, ctxPLAYER) {
+  function GameView(game, ctxHUD, ctxBG, ctxPLAYER) {
     _classCallCheck(this, GameView);
 
-    this.ctxBORDER = ctxBORDER;
     this.ctxHUD = ctxHUD;
     this.ctxBG = ctxBG;
     this.ctxPLAYER = ctxPLAYER;
@@ -668,6 +695,8 @@ var GameView = function () {
   _createClass(GameView, [{
     key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
+      var _this = this;
+
       var player = this.player;
 
 
@@ -681,6 +710,35 @@ var GameView = function () {
         if (GameView.RUN[event.key]) player.stopRunning();
         if (GameView.CLIMB[event.key]) player.stopClimbing();
       });
+
+      var instructionsButton = document.getElementsByClassName('instructions-button')[0];
+      var instructionsModal = document.getElementsByClassName('instructions-container')[0];
+      var closeInstructionsButton = document.getElementsByClassName('close-modal')[0];
+
+      var game = this.game;
+
+      instructionsButton.addEventListener('click', function () {
+        instructionsModal.classList.add('active');
+        game.pause();
+      });
+
+      closeInstructionsButton.addEventListener('click', function () {
+        instructionsModal.classList.remove('active');
+        game.unpause();
+      });
+
+      var playAgainButton = document.getElementsByClassName('play-again')[0];
+
+      playAgainButton.addEventListener('click', function () {
+        _this.resetGame();
+      });
+    }
+  }, {
+    key: 'resetGame',
+    value: function resetGame() {
+      this.game = new _game2.default();
+      this.player = this.game.addPlayers();
+      this.bindKeyHandlers();
     }
   }, {
     key: 'start',
@@ -696,7 +754,7 @@ var GameView = function () {
       var timeDelta = time - this.lastTime;
 
       this.game.step(timeDelta);
-      this.game.draw(this.ctxBORDER, this.ctxHUD, this.ctxBG, this.ctxPLAYER);
+      this.game.draw(this.ctxHUD, this.ctxBG, this.ctxPLAYER);
       this.lastTime = time;
       requestAnimationFrame(this.animate.bind(this));
     }

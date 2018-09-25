@@ -13,7 +13,9 @@
 
 <body>
   <header id="image-container">
+    <span class="play-again">Play Again</span>
     <img src="https://raw.githubusercontent.com/wburke415/BubbleBros/master/lib/images/BubbleBrosLogo.png"/>
+    <span class="instructions-button">Instructions</span>
   </header>
   <section id="canvas-container">
       <canvas id="border"></canvas>
@@ -21,9 +23,31 @@
       <canvas id="background"></canvas>
       <canvas id="player"></canvas>
   </section>
-  <div>
-    Use grappling hooks to destroy the bubbles and collect points. Once you destroy all the bubbles you win the level.
-    Press W,A,S,D to move up and down. Press the space button to shoot.
+
+  <div class="instructions-container">
+    <div id="modal-screen"></div>
+    <div id="instructions">
+      <div class="close-modal">X</div>
+      <h1>Welcome to Bubble Bros!</h1>
+      <br/>
+      <div class="description">
+  The point of the game is to use your grappling hook to destroy all of the bubbles on each level.<br/>
+      The grappling hook will stick to any surface it hits for a few seconds, allowing you to move away if necessary.<br/>
+      Be careful though, every time you pop larger bubbles they will split into smaller and smaller bubbles.<br/>
+      You get points for every bubble you pop, the smaller the popped bubble, the more points you get.<br/>
+      </div>
+      
+  
+      <br/>
+      <h1>Controls</h1><br/>
+      <div class="controls">
+        Move Left - A<br />
+        Move Right - D<br />
+        Climb Up - W<br />
+        Climb Down - S<br />
+        Fire Grappling Hook - Space<br />
+      </div>
+    </div>
   </div>
 </body>
 
