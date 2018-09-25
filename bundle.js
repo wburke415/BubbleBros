@@ -124,7 +124,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var DEFAULTS = {
   VELOCITY: [2, 4],
-  GRAVITY: 0.15,
+  GRAVITY: .2,
   SIZE: 0
 };
 
@@ -193,16 +193,19 @@ var Bubble = function (_MovingObject) {
   }, {
     key: 'splitBubble',
     value: function splitBubble() {
+      var vel = void 0;
+      this.vel[1] < 0 ? vel = this.vel[1] : vel = this.vel[1] * -1;
+
       this.game.add(new Bubble({
         game: this.game,
         pos: [this.pos[0] - 5, this.pos[1]],
-        vel: [this.vel[0] * -1, this.vel[1]],
+        vel: [this.vel[0] * -1, vel],
         size: this.size + 1
       }));
       this.game.add(new Bubble({
         game: this.game,
         pos: [this.pos[0] + 5, this.pos[1]],
-        vel: this.vel,
+        vel: [this.vel[0], vel],
         size: this.size + 1
       }));
 
@@ -313,7 +316,6 @@ var Game = function () {
     this.ladders = [];
 
     this.level = 1;
-
     this.addBubbles();
     this.addPlatforms();
 
@@ -321,6 +323,7 @@ var Game = function () {
     this.countdown = true;
     this.timer = 300;
 
+    this.gameWon = false;
     this.gameOver = false;
     this.paused = false;
 
@@ -343,7 +346,6 @@ var Game = function () {
       if (object instanceof _bubble2.default) {
         this.bubbles.push(object);
       } else if (object instanceof _grapple2.default) {
-        this.grapples = [];
         this.grapples.push(object);
       } else if (object instanceof _player2.default) {
         this.players.push(object);
@@ -380,7 +382,7 @@ var Game = function () {
           pos: level.PLATFORM_POS[i].slice(0),
           height: level.PLATFORM_HEIGHT[i],
           width: level.PLATFORM_WIDTH[i],
-          hasLadder: level.PLATFORM_HAS_LADDER
+          hasLadder: level.PLATFORM_HAS_LADDER[i]
         }));
       }
     }
@@ -388,10 +390,11 @@ var Game = function () {
     key: 'addPlayers',
     value: function addPlayers() {
       var mainPlayer = void 0;
+      var level = _level_config.LEVELS[this.level];
 
       for (var i = 0; i < Game.NUM_PLAYERS; i++) {
         var player = new _player2.default({
-          pos: this.playerStartPos(i),
+          pos: level.PLAYER_START_POS || this.playerStartPos(i),
           game: this,
           playerNumber: i
         });
@@ -415,17 +418,19 @@ var Game = function () {
   }, {
     key: 'checkCollisions',
     value: function checkCollisions() {
-      var allObjects = this.allObjects();
-      for (var i = 0; i < allObjects.length; i++) {
-        for (var j = 0; j < allObjects.length; j++) {
+      if (!this.stageClear && !this.gameOver) {
+        var allObjects = this.allObjects();
+        for (var i = 0; i < allObjects.length; i++) {
+          for (var j = 0; j < allObjects.length; j++) {
 
-          var obj1 = allObjects[i];
-          var obj2 = allObjects[j];
+            var obj1 = allObjects[i];
+            var obj2 = allObjects[j];
 
-          var isCollidedWith = obj1.isCollidedWith(obj2);
+            var isCollidedWith = obj1.isCollidedWith(obj2);
 
-          if (isCollidedWith) {
-            obj1.collideWith(obj2, isCollidedWith);
+            if (isCollidedWith) {
+              obj1.collideWith(obj2, isCollidedWith);
+            }
           }
         }
       }
@@ -468,6 +473,12 @@ var Game = function () {
         return object.draw(ctxBG);
       });
 
+      if (this.gameWon) {
+        ctxBG.font = "120px Sans Serif";
+        ctxBG.fillStyle = 'red';
+        ctxBG.fillText('You Win!', 215, Game.DIM_Y / 2);
+      }
+
       if (this.stageClear && this.timer > 0) {
         var stageClear = new Image();
         stageClear.src = Game.STAGE_CLEAR_IMAGE;
@@ -486,16 +497,16 @@ var Game = function () {
         ctxBG.drawImage(gameOver, Game.GAME_OVER[0], Game.GAME_OVER[1], Game.GAME_OVER[2], Game.GAME_OVER[3], Game.DIM_X / 4, Game.DIM_Y / 3, Game.GAME_OVER[2], Game.GAME_OVER[3]); // img, x of top left in img, y of top left in img, width of img, height of img, x coordinate to render at, y coordinate to render at, scale x of img, scale y of img
       } else if (this.countdown && this.timer > 0) {
         if (this.timer > 200) {
-          ctxBG.font = "120px Sans Serif";
-          ctxBG.fillStyle = 'black';
+          ctxBG.font = "120px Fantasy";
+          ctxBG.fillStyle = 'white';
           ctxBG.fillText('3', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
         } else if (this.timer > 100) {
-          ctxBG.font = "120px Sans Serif";
-          ctxBG.fillStyle = "black";
+          ctxBG.font = "120px Fantasy";
+          ctxBG.fillStyle = "white";
           ctxBG.fillText('2', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
         } else if (this.timer > 0) {
-          ctxBG.font = "120px Sans Serif";
-          ctxBG.fillStyle = "black";
+          ctxBG.font = "120px Fantasy";
+          ctxBG.fillStyle = "white";
           ctxBG.fillText('1', Game.DIM_X / 2 - 45, Game.DIM_Y / 2);
         }
         this.timer -= 2;
@@ -542,15 +553,20 @@ var Game = function () {
   }, {
     key: 'moveObjects',
     value: function moveObjects(delta) {
-      if (!this.stageClear && !this.gameOver && !this.countdown) {
-        this.allObjects().forEach(function (object) {
-          if (object instanceof _grapple2.default) {
-            object.height += Math.abs(object.vel[1]);
-          } else if (object instanceof _ladder2.default && object.building) {
-            object.height += 5;
-          }
-          object.move(delta);
-        });
+      if (!this.stageClear && !this.gameOver) {
+        if (!this.countdown) {
+          this.allObjects().forEach(function (object) {
+            if (object instanceof _grapple2.default) {
+              object.height += Math.abs(object.vel[1]);
+            }
+            object.move(delta);
+          });
+        } else {
+          this.ladders.forEach(function (ladder) {
+            if (ladder.building) ladder.height += 5;
+            ladder.move(delta);
+          });
+        }
       }
     }
   }, {
@@ -562,13 +578,19 @@ var Game = function () {
         this.points += 100 * (object.size + 1);
         this.bubbles.splice(this.bubbles.indexOf(object), 1);
         if (this.bubbles.length === 0) {
-          this.stageClear = true;
+          if (this.level < 10) {
+            this.stageClear = true;
+          } else {
+            this.gameWon = true;
+          }
         }
       } else if (object instanceof _player2.default) {
         this.players.splice(this.players.indexOf(object), 1);
         if (this.players.length === 0) {
           this.gameOver = true;
         }
+      } else if (object instanceof _platform2.default) {
+        this.platforms.splice(this.platforms.indexOf(object), 1);
       } else {
         throw new Error('Unknown type of object');
       }
@@ -618,6 +640,8 @@ var Game = function () {
   }, {
     key: 'playerStartPos',
     value: function playerStartPos(playerNumber) {
+      var level = _level_config.LEVELS[this.level];
+      if (level.PLAYER_START_POS) return level.PLAYER_START_POS;
       return [Game.DIM_X * Game.PLAYER_START_POS[playerNumber][0], Game.DIM_Y * Game.PLAYER_START_POS[playerNumber][1]];
     }
   }, {
@@ -653,7 +677,7 @@ Game.GAME_OVER_IMAGE = 'https://raw.githubusercontent.com/wburke415/BubbleBros/m
 Game.GAME_OVER = [9, 3, 414, 67];
 
 Game.NUM_PLAYERS = 1;
-Game.PLAYER_START_POS = [[0.05, 0.83], [0.95, 0.83]];
+Game.PLAYER_START_POS = [[0.45, 0.83], [0.95, 0.83]];
 
 /***/ }),
 
@@ -821,7 +845,7 @@ var HOOK = [4, 0, 222, 264];
 var DEFAULTS = {
   WIDTH: 5,
   HEIGHT: 0,
-  VELOCITY: Object.freeze([0, -5]),
+  VELOCITY: Object.freeze([0, -7]),
   GRAVITY: 0,
   FREEZE_DUR: 75
 };
@@ -858,8 +882,11 @@ var Grapple = function (_MovingObject) {
   }, {
     key: 'collideWith',
     value: function collideWith(otherObject) {
-      if (otherObject instanceof _platform2.default) {
+      if (otherObject instanceof _platform2.default && otherObject.ladder) {
         this.handleOutOfBounds('y');
+      } else if (otherObject instanceof _platform2.default && !otherObject.ladder) {
+        otherObject.remove();
+        this.remove();
       }
     }
   }, {
@@ -975,122 +1002,126 @@ var LEVELS = exports.LEVELS = {
   1: {
     NUM_BUBBLES: 1,
     BUBBLE_SIZE: [1],
-    BUBBLE_START_POS: [[800, 200]],
-    BUBBLE_VELOCITY: [[-2, 4]],
+    BUBBLE_START_POS: [[100, 100]],
+    BUBBLE_VELOCITY: [[2, 0]],
 
     NUM_PLATFORMS: 0,
     PLATFORM_POS: [],
     PLATFORM_HEIGHT: [],
     PLATFORM_WIDTH: [],
-    PLATFORM_HAS_LADDER: false
+    PLATFORM_HAS_LADDER: [false]
   },
   2: {
-    NUM_BUBBLES: 2,
-    BUBBLE_SIZE: [1, 2],
-    BUBBLE_START_POS: [[100, 200], [800, 200]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4]],
+    NUM_BUBBLES: 1,
+    BUBBLE_SIZE: [0],
+    BUBBLE_START_POS: [[320, 60]],
+    BUBBLE_VELOCITY: [[2, 0]],
 
     NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[150, 300]],
+    PLATFORM_POS: [[380, 180]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200],
-    PLATFORM_HAS_LADDER: true
+    PLATFORM_WIDTH: [150],
+    PLATFORM_HAS_LADDER: [false]
   },
   3: {
     NUM_BUBBLES: 2,
-    BUBBLE_SIZE: [1, 1],
-    BUBBLE_START_POS: [[100, 200], [800, 200]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4]],
+    BUBBLE_SIZE: [0, 2],
+    BUBBLE_START_POS: [[100, 50], [500, 250]],
+    BUBBLE_VELOCITY: [[2, 0], [-2, 0]],
 
-    NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[650, 300]],
-    PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200],
-    PLATFORM_HAS_LADDER: true
+    NUM_PLATFORMS: 4,
+    PLATFORM_POS: [[180, 160], [430, 160], [680, 160], [430, 300]],
+    PLATFORM_HEIGHT: [10, 10, 10, 10],
+    PLATFORM_WIDTH: [75, 75, 75, 75],
+    PLATFORM_HAS_LADDER: [false, false, false, false]
   },
   4: {
-    NUM_BUBBLES: 2,
-    BUBBLE_SIZE: [0, 1],
-    BUBBLE_START_POS: [[100, 200], [800, 200]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4]],
+    PLAYER_START_POS: [424, 300],
+
+    NUM_BUBBLES: 1,
+    BUBBLE_SIZE: [0],
+    BUBBLE_START_POS: [[300, 70]],
+    BUBBLE_VELOCITY: [[-2, 0]],
 
     NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[270, 200]],
+    PLATFORM_POS: [[350, 360]],
     PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [400],
-    PLATFORM_HAS_LADDER: true
+    PLATFORM_WIDTH: [200],
+    PLATFORM_HAS_LADDER: [true]
   },
   5: {
-    NUM_BUBBLES: 3,
-    BUBBLE_SIZE: [1, 1, 2],
-    BUBBLE_START_POS: [[100, 200], [800, 200], [800, 250]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4], [-2, 4]],
+    NUM_BUBBLES: 2,
+    BUBBLE_SIZE: [0, 1],
+    BUBBLE_START_POS: [[100, 50], [400, 130]],
+    BUBBLE_VELOCITY: [[2, 0], [-2, 0]],
 
-    NUM_PLATFORMS: 0,
-    PLATFORM_POS: [],
-    PLATFORM_HEIGHT: [],
-    PLATFORM_WIDTH: [],
-    PLATFORM_HAS_LADDER: true
+    NUM_PLATFORMS: 3,
+    PLATFORM_POS: [[180, 160], [430, 200], [680, 160]],
+    PLATFORM_HEIGHT: [10, 10, 10],
+    PLATFORM_WIDTH: [75, 75, 75],
+    PLATFORM_HAS_LADDER: [false, false, false]
   },
   6: {
     NUM_BUBBLES: 2,
-    BUBBLE_SIZE: [1, 2],
-    BUBBLE_START_POS: [[100, 200], [800, 200], [100, 300]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4], [2, 4]],
+    BUBBLE_SIZE: [0, 0],
+    BUBBLE_START_POS: [[150, 60], [650, 60]],
+    BUBBLE_VELOCITY: [[-2, 0], [2, 0]],
 
     NUM_PLATFORMS: 2,
-    PLATFORM_POS: [[150, 300], [600, 300]],
+    PLATFORM_POS: [[180, 160], [680, 160]],
     PLATFORM_HEIGHT: [10, 10],
-    PLATFORM_WIDTH: [250, 250],
-    PLATFORM_HAS_LADDER: true
+    PLATFORM_WIDTH: [50, 50],
+    PLATFORM_HAS_LADDER: [false, false]
   },
   7: {
-    NUM_BUBBLES: 3,
-    BUBBLE_SIZE: [1, 2, 3],
-    BUBBLE_START_POS: [[100, 200], [800, 200], [100, 100]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4], [2, 4]],
+    NUM_BUBBLES: 2,
+    BUBBLE_SIZE: [1, 1],
+    BUBBLE_START_POS: [[100, 100], [750, 100]],
+    BUBBLE_VELOCITY: [[2, 0], [-2, 0]],
 
-    NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[40, 300]],
-    PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [200],
-    PLATFORM_HAS_LADDER: true
+    NUM_PLATFORMS: 8,
+    PLATFORM_POS: [[80, 200], [80, 210], [630, 200], [630, 210], [350, 140], [350, 150], [350, 280], [350, 290]],
+    PLATFORM_HEIGHT: [10, 10, 10, 10, 10, 10, 10, 10],
+    PLATFORM_WIDTH: [150, 150, 150, 150, 150, 150, 150, 150],
+    PLATFORM_HAS_LADDER: [false, false, false, false, false, false, false, false]
   },
   8: {
-    NUM_BUBBLES: 2,
-    BUBBLE_SIZE: [0, 0],
-    BUBBLE_START_POS: [[100, 200], [800, 200]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4]],
+    NUM_BUBBLES: 4,
+    BUBBLE_SIZE: [0, 2, 2, 3],
+    BUBBLE_START_POS: [[400, 120], [100, 25], [200, 25], [300, 25]],
+    BUBBLE_VELOCITY: [[3, 0], [2, 0], [2, 0], [2, 0]],
 
-    NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[300, 300]],
-    PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [300],
-    PLATFORM_HAS_LADDER: true
+    NUM_PLATFORMS: 6,
+    PLATFORM_POS: [[20, 100], [240, 100], [460, 100], [680, 100], [40, 230], [600, 350]],
+    PLATFORM_HEIGHT: [10, 10, 10, 10, 10, 10],
+    PLATFORM_WIDTH: [220, 220, 220, 220, 120, 120],
+    PLATFORM_HAS_LADDER: [false, false, false, false, true, true]
   },
   9: {
-    NUM_BUBBLES: 3,
-    BUBBLE_SIZE: [0, 0, 2],
-    BUBBLE_START_POS: [[100, 200], [800, 200], [100, 100]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4], [2, 4]],
+    PLAYER_START_POS: [424, 360],
 
-    NUM_PLATFORMS: 0,
-    PLATFORM_POS: [],
-    PLATFORM_HEIGHT: [],
-    PLATFORM_WIDTH: [],
-    PLATFORM_HAS_LADDER: true
+    NUM_BUBBLES: 2,
+    BUBBLE_SIZE: [0, 0],
+    BUBBLE_START_POS: [[400, 100], [400, 100]],
+    BUBBLE_VELOCITY: [[3, 0], [-3, 0]],
+
+    NUM_PLATFORMS: 3,
+    PLATFORM_POS: [[100, 420], [420, 420], [700, 420]],
+    PLATFORM_HEIGHT: [10, 10, 10],
+    PLATFORM_WIDTH: [100, 100, 100],
+    PLATFORM_HAS_LADDER: [true, true, true]
   },
   10: {
-    NUM_BUBBLES: 3,
-    BUBBLE_SIZE: [0, 0, 1],
-    BUBBLE_START_POS: [[100, 200], [800, 200], [100, 100]],
-    BUBBLE_VELOCITY: [[2, 4], [-2, 4], [2, 4]],
+    NUM_BUBBLES: 2,
+    BUBBLE_SIZE: [1, 0],
+    BUBBLE_START_POS: [[100, 100], [750, 30]],
+    BUBBLE_VELOCITY: [[3, 0], [-2, 0]],
 
-    NUM_PLATFORMS: 1,
-    PLATFORM_POS: [[300, 300]],
-    PLATFORM_HEIGHT: [10],
-    PLATFORM_WIDTH: [300],
-    PLATFORM_HAS_LADDER: true
+    NUM_PLATFORMS: 14,
+    PLATFORM_POS: [[100, 200], [200, 200], [300, 200], [400, 200], [500, 200], [600, 200], [700, 200], [150, 300], [250, 300], [350, 300], [450, 300], [550, 300], [650, 300], [750, 300]],
+    PLATFORM_HEIGHT: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+    PLATFORM_WIDTH: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+    PLATFORM_HAS_LADDER: false
   },
   11: {},
   12: {},
@@ -1233,7 +1264,7 @@ var Platform = function (_MovingObject) {
 
     var _this = _possibleConstructorReturn(this, (Platform.__proto__ || Object.getPrototypeOf(Platform)).call(this, options));
 
-    _this.hasLadder = options.hasLadder || true;
+    _this.hasLadder = options.hasLadder;
     if (_this.hasLadder) _this.ladder = _this.generateLadder();
     return _this;
   }
@@ -1329,7 +1360,7 @@ var CLIMBING_ANIMATION = [[12, 73, 24, 32], [48, 73, 24, 32], [80, 73, 26, 32], 
 var COLLISION_ANIMATION_RIGHT = [80, 149, 41, 30];
 var COLLISION_ANIMATION_LEFT = [131, 149, 41, 30];
 
-var GRAPPLE_TIMEOUT = 400;
+var GRAPPLE_TIMEOUT = 300;
 
 var DEFAULTS = {
   VELOCITY: Object.freeze([0, 0]),
@@ -1394,7 +1425,10 @@ var Player = function (_MovingObject) {
           }
         }, 2000);
       }
-      if (otherObject instanceof _platform2.default) this.platform = otherObject;
+      if (otherObject instanceof _platform2.default) {
+        this.platform = otherObject;
+        this.ladder = otherObject.ladder;
+      }
       if (otherObject instanceof _ladder2.default) this.ladder = otherObject;
     }
   }, {
@@ -1417,21 +1451,19 @@ var Player = function (_MovingObject) {
 
       var time = new Date();
 
-      if (time - this.lastFire > GRAPPLE_TIMEOUT) {
+      if (time - this.lastFire > GRAPPLE_TIMEOUT && !this.dying && !this.game.countdown && this.gravity === 0) {
         this.sprite = FIRE_GRAPPLE_ANIMATION;
         this.spriteIndex = 0;
-        this.pos[1] += 10;
 
         this.lastFire = time;
         setTimeout(function () {
           var grapple = new _grapple2.default({
-            pos: [_this3.pos[0] + 27, _this3.pos[1] + 27],
+            pos: [_this3.pos[0] + 27, _this3.pos[1] + 32],
             game: _this3.game
           });
 
           _this3.game.add(grapple);
           _this3.sprite = STANDING_ANIMATION;
-          _this3.pos[1] -= 10;
         }, 100);
       }
     }
@@ -1440,22 +1472,22 @@ var Player = function (_MovingObject) {
     value: function handleOutOfBounds(axis) {
       if (axis === 'x' && this.pos[0] < 100) this.pos[0] += 5;
       if (axis === 'x' && this.pos[0] > 100) this.pos[0] -= 5;
+      if (axis === 'y' && this.pos[1] > this.game.playerStartPos(this.playerNumber)[1] + 10 && !this.dying) {
+        this.climbing = false;
+        this.gravity = 0;
+        this.vel = [0, 0];
+        this.pos[1] = 417;
+      }
     }
   }, {
     key: 'run',
     value: function run(changeInPos) {
-      if (!this.dying && !this.game.stageClear && !this.climbing) {
+      if (!this.dying && !this.game.stageClear && !this.climbing && !this.game.countdown) {
         var platform = this.platform;
 
-        if (platform && this.pos[0] <= platform.pos[0]) {
-          this.pos[0] += 5;
-          this.stopRunning();
-          return;
-        }
-        if (platform && this.pos[0] >= platform.pos[0] + platform.width - this.width) {
-          this.pos[0] -= 5;
-          this.stopRunning();
-          return;
+        if (platform && (this.pos[0] < platform.pos[0] || this.pos[0] > platform.pos[0] + platform.width - this.width)) {
+          this.gravity += 0.5;
+          this.platform = false;
         }
 
         this.vel[0] = changeInPos[0] * 3;
@@ -1481,13 +1513,13 @@ var Player = function (_MovingObject) {
   }, {
     key: 'climb',
     value: function climb(changeInPos) {
-      if (!this.dying && !this.game.stageClear) {
+      if (!this.dying && !this.game.stageClear && this.vel[0] === 0 && !this.game.countdown) {
         if (changeInPos[1] === -1 && this.ladder && this.isCollidedWith(this.ladder)) {
           this.climbing = true;
           this.vel[1] = changeInPos[1] * 2;
           this.sprite = CLIMBING_ANIMATION[Math.floor(this.spriteIndex)];
           this.spriteIndex = (this.spriteIndex + 0.5) % 4;
-        } else if (changeInPos[1] === 1 && this.isCollidedWith(this.ladder, 10) && !this.game.isOutOfBounds(this)) {
+        } else if (changeInPos[1] === 1 && this.isCollidedWith(this.ladder, 10) && this.pos[1] < 412) {
           this.climbing = true;
           this.vel[1] = changeInPos[1] * 2;
           this.sprite = CLIMBING_ANIMATION[Math.floor(this.spriteIndex)];
