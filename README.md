@@ -32,7 +32,7 @@ Because HTML Canvas does not support layering, I used three different canvas ele
 
 ## Grappling Hook
 
-![game_snippet](/lib/images/grapple_snippet.png) 
+<img src="./lib/images/grapple_snippet.png" width="100" height="200" />
 
 ```javascript
   fireGrapple() {
